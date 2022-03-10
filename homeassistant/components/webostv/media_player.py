@@ -196,6 +196,7 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
 
     def _update_states(self) -> None:
         """Update entity state attributes."""
+        _LOGGER.debug("%s: _update_states start", self.entity_id)
         self._update_sources()
 
         self._attr_state = STATE_ON if self._client.is_on else STATE_OFF
@@ -206,6 +207,7 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             self._attr_volume_level = cast(float, self._client.volume / 100.0)
 
         self._attr_source = self._current_source
+        _LOGGER.debug("%s: self._attr_source: %s", self.entity_id, self._attr_source)
         self._attr_source_list = sorted(self._source_list)
 
         self._attr_media_content_type = None
@@ -218,6 +220,9 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
         ):
             self._attr_media_title = cast(
                 str, self._client.current_channel.get("channelName")
+            )
+            _LOGGER.debug(
+                "%s: self._attr_media_title: %s", self.entity_id, self._attr_media_title
             )
 
         self._attr_media_image_url = None
@@ -256,19 +261,31 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             self._attr_extra_state_attributes = {
                 ATTR_SOUND_OUTPUT: self._client.sound_output
             }
+        _LOGGER.debug("%s: _update_states end", self.entity_id)
 
     def _update_sources(self) -> None:
         """Update list of sources from current source, apps, inputs and configured list."""
+        _LOGGER.debug("%s: _update_sources start", self.entity_id)
         source_list = self._source_list
         self._source_list = {}
         conf_sources = self._sources
+        _LOGGER.debug("%s: conf_sources: %s", self.entity_id, conf_sources)
 
         found_live_tv = False
+        _LOGGER.debug(
+            "%s: client.apps.values: %s", self.entity_id, self._client.apps.values()
+        )
         for app in self._client.apps.values():
             if app["id"] == LIVE_TV_APP_ID:
                 found_live_tv = True
+                _LOGGER.debug("%s: found_live_tv1", self.entity_id)
             if app["id"] == self._client.current_app_id:
                 self._current_source = app["title"]
+                _LOGGER.debug(
+                    "%s: self._current_source1: %s",
+                    self.entity_id,
+                    self._current_source,
+                )
                 self._source_list[app["title"]] = app
             elif (
                 not conf_sources
@@ -278,11 +295,21 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             ):
                 self._source_list[app["title"]] = app
 
+        _LOGGER.debug("%s: self._source_list1: %s", self.entity_id, self._source_list)
+        _LOGGER.debug(
+            "%s: client.inputs.values: %s", self.entity_id, self._client.inputs.values()
+        )
         for source in self._client.inputs.values():
             if source["appId"] == LIVE_TV_APP_ID:
                 found_live_tv = True
+                _LOGGER.debug("%s: found_live_tv2", self.entity_id)
             if source["appId"] == self._client.current_app_id:
                 self._current_source = source["label"]
+                _LOGGER.debug(
+                    "%s: self._current_source2: %s",
+                    self.entity_id,
+                    self._current_source,
+                )
                 self._source_list[source["label"]] = source
             elif (
                 not conf_sources
@@ -291,6 +318,7 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             ):
                 self._source_list[source["label"]] = source
 
+        _LOGGER.debug("%s: self._source_list2: %s", self.entity_id, self._source_list)
         # empty list, TV may be off, keep previous list
         if not self._source_list and source_list:
             self._source_list = source_list
@@ -300,6 +328,12 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             app = {"id": LIVE_TV_APP_ID, "title": "Live TV"}
             if LIVE_TV_APP_ID == self._client.current_app_id:
                 self._current_source = app["title"]
+                _LOGGER.debug(
+                    "%s: self._current_source3: %s",
+                    self.entity_id,
+                    self._current_source,
+                )
+                _LOGGER.debug("%s: _source_list_l1: %s", self.entity_id, app)
                 self._source_list["Live TV"] = app
             elif (
                 not conf_sources
@@ -307,7 +341,11 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
                 or any(word in app["title"] for word in conf_sources)
                 or any(word in app["id"] for word in conf_sources)
             ):
+                _LOGGER.debug("%s: _source_list_l2: %s", self.entity_id, app)
                 self._source_list["Live TV"] = app
+
+        _LOGGER.debug("%s: self._source_list3: %s", self.entity_id, self._source_list)
+        _LOGGER.debug("%s: self._source_list end", self.entity_id)
 
     @util.Throttle(MIN_TIME_BETWEEN_SCANS, MIN_TIME_BETWEEN_FORCED_SCANS)
     async def async_update(self) -> None:
@@ -315,8 +353,10 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
         if self._client.is_connected():
             return
 
+        _LOGGER.debug("%s: client.connect() start", self.entity_id)
         with suppress(*WEBOSTV_EXCEPTIONS, WebOsTvPairError):
             await self._client.connect()
+        _LOGGER.debug("%s: client.connect() end", self.entity_id)
 
     @property
     def supported_features(self) -> int:
@@ -376,9 +416,13 @@ class LgWebOSMediaPlayerEntity(RestoreEntity, MediaPlayerEntity):
             _LOGGER.warning("Source %s not found for %s", source, self.name)
             return
         if source_dict.get("title"):
+            _LOGGER.debug("%s: launch_app: %s", self.entity_id, source_dict["id"])
             await self._client.launch_app(source_dict["id"])
+            _LOGGER.debug("%s: launch_app end", self.entity_id)
         elif source_dict.get("label"):
+            _LOGGER.debug("%s: set_input: %s", self.entity_id, source_dict["id"])
             await self._client.set_input(source_dict["id"])
+            _LOGGER.debug("%s: set_input end", self.entity_id)
 
     @cmd
     async def async_play_media(
