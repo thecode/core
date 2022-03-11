@@ -5,7 +5,6 @@ import logging
 from typing import Any
 from urllib.parse import urlparse
 
-from aiowebostv import WebOsTvPairError
 import voluptuous as vol
 
 from homeassistant import config_entries, data_entry_flow
@@ -22,6 +21,7 @@ from homeassistant.data_entry_flow import FlowResult
 from homeassistant.helpers import config_validation as cv
 
 from . import async_control_connect
+from .aiowebostv import WebOsTvPairError
 from .const import CONF_SOURCES, DEFAULT_NAME, DOMAIN, WEBOSTV_EXCEPTIONS
 from .helpers import async_get_sources
 

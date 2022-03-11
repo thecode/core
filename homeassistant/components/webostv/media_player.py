@@ -8,7 +8,6 @@ from functools import wraps
 import logging
 from typing import Any, TypeVar, cast
 
-from aiowebostv import WebOsClient, WebOsTvPairError
 from typing_extensions import Concatenate, ParamSpec
 
 from homeassistant import util
@@ -48,6 +47,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.restore_state import RestoreEntity
 
 from . import WebOsClientWrapper
+from .aiowebostv import WebOsClient, WebOsTvPairError
 from .const import (
     ATTR_PAYLOAD,
     ATTR_SOUND_OUTPUT,

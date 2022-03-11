@@ -10,7 +10,6 @@ import os
 from pickle import loads
 from typing import Any
 
-from aiowebostv import WebOsClient, WebOsTvPairError
 import sqlalchemy as db
 import voluptuous as vol
 
@@ -41,6 +40,7 @@ from homeassistant.helpers import config_validation as cv, discovery, entity_reg
 from homeassistant.helpers.dispatcher import async_dispatcher_send
 from homeassistant.helpers.typing import ConfigType
 
+from .aiowebostv import WebOsClient, WebOsTvPairError
 from .const import (
     ATTR_BUTTON,
     ATTR_CONFIG_ENTRY_ID,

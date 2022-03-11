@@ -1,8 +1,9 @@
 """Constants used for LG webOS Smart TV."""
 import asyncio
 
-from aiowebostv import WebOsTvCommandError
 from websockets.exceptions import ConnectionClosed, ConnectionClosedOK
+
+from .aiowebostv import WebOsTvCommandError
 
 DOMAIN = "webostv"
 PLATFORMS = ["media_player"]
