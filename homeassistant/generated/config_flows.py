@@ -242,6 +242,7 @@ FLOWS = {
         "oncue",
         "ondilo_ico",
         "onewire",
+        "onewire_sysbus",
         "onvif",
         "open_meteo",
         "opengarage",

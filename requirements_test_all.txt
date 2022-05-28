@@ -810,6 +810,7 @@ pexpect==4.6.0
 phone_modem==0.1.1
 
 # homeassistant.components.onewire
+# homeassistant.components.onewire_sysbus
 pi1wire==0.1.0
 
 # homeassistant.components.pilight
