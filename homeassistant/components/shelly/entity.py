@@ -81,12 +81,16 @@ def async_setup_block_attribute_entities(
             if getattr(block, sensor_id, None) in (-1, None):
                 continue
 
+            entity_class = sensor_class
+            if description.entity_class is not None:
+                entity_class = description.entity_class
+
             # Filter and remove entities that according to settings
             # should not create an entity
             if description.removal_condition and description.removal_condition(
                 coordinator.device.settings, block
             ):
-                domain = sensor_class.__module__.split(".")[-1]
+                domain = entity_class.__module__.split(".")[-1]
                 unique_id = f"{coordinator.mac}-{block.description}-{sensor_id}"
                 async_remove_shelly_entity(hass, domain, unique_id)
             else:
@@ -276,6 +280,8 @@ class BlockEntityDescription(EntityDescription):
     # Callable (settings, block), return true if entity should be removed
     removal_condition: Callable[[dict, Block], bool] | None = None
     extra_state_attributes: Callable[[Block], dict | None] | None = None
+
+    entity_class: Callable | None = None
 
 
 @dataclass(frozen=True)
