@@ -733,11 +733,11 @@ def _get_homeassistant_url(hass: HomeAssistant) -> URL | None:
 
 
 def get_coiot_address(hass: HomeAssistant) -> str | None:
-    """Return the CoIoT ip address."""
+    """Return the CoIoT address (ip:port)."""
     url = _get_homeassistant_url(hass)
     if url is None:
         return None
-    return str(url.host)
+    return f"{url.host}:{get_coiot_port(hass)}"
 
 
 def get_rpc_ws_url(hass: HomeAssistant) -> str | None:

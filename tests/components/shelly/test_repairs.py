@@ -590,11 +590,11 @@ async def test_coiot_configured_no_issue_created(
     issue_registry: ir.IssueRegistry,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
-    """Test no repair issues when CoIoT configuration is missing."""
+    """Test no repair issues when CoIoT configuration is valid."""
     monkeypatch.setitem(
         mock_block_device.settings,
         "coiot",
-        {"enabled": True, "update_period": 15, "peer": "10.10.10.10"},
+        {"enabled": True, "update_period": 15, "peer": "10.10.10.10:5683"},
     )
     issue_id = COIOT_UNCONFIGURED_ISSUE_ID.format(unique=MOCK_MAC)
     assert await async_setup_component(hass, "repairs", {})
